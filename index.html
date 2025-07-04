@@ -45,9 +45,9 @@
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Hi, I'm <span class="highlight">Nishi</span></h1>
-            <p class="hero-subtitle">B.Tech Computer Science Student</p>
-            <p class="hero-description">A passionate student at Lovely Professional University building creative and practical tech solutions that make an impact</p>
+            <h1 id="typing-text">Hi, I'm <span class="highlight">Nishi</span><span class="typing-cursor">|</span></h1>
+            <p class="hero-subtitle" id="subtitle" style="opacity: 0;">B.Tech Computer Science Student</p>
+            <p class="hero-description" id="description" style="opacity: 0;">A passionate student at Lovely Professional University building creative and practical tech solutions that make an impact</p>
             <div class="hero-buttons">
                 <a href="#portfolio" class="btn-primary">View My Projects</a>
                 <a href="#contact" class="btn-secondary">Get In Touch</a>
@@ -377,6 +377,62 @@
         
         // Load GitHub stats
         loadGitHubStats();
+        
+        // Live Typing Animation
+        function typeWriter() {
+            const texts = [
+                "Hi, I'm <span class='highlight'>Nishi</span>",
+                "B.Tech Computer Science Student",
+                "A passionate student at Lovely Professional University building creative and practical tech solutions that make an impact"
+            ];
+            
+            const typingElement = document.getElementById('typing-text');
+            const subtitle = document.getElementById('subtitle');
+            const description = document.getElementById('description');
+            
+            let textIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            
+            function type() {
+                const currentText = texts[textIndex];
+                
+                if (textIndex === 0) {
+                    // Main title typing
+                    if (!isDeleting && charIndex < currentText.length) {
+                        const char = currentText.charAt(charIndex);
+                        if (char === '<') {
+                            // Handle HTML tags
+                            const tagEnd = currentText.indexOf('>', charIndex);
+                            typingElement.innerHTML = currentText.substring(0, tagEnd + 1) + '<span class="typing-cursor">|</span>';
+                            charIndex = tagEnd + 1;
+                        } else {
+                            typingElement.innerHTML = currentText.substring(0, charIndex + 1) + '<span class="typing-cursor">|</span>';
+                            charIndex++;
+                        }
+                        setTimeout(type, 100);
+                    } else {
+                        // Remove cursor and show subtitle
+                        typingElement.innerHTML = currentText;
+                        setTimeout(() => {
+                            subtitle.style.opacity = '1';
+                            setTimeout(() => {
+                                description.style.opacity = '1';
+                            }, 800);
+                        }, 500);
+                    }
+                }
+            }
+            
+            // Start typing animation after a short delay
+            setTimeout(() => {
+                typingElement.innerHTML = '<span class="typing-cursor">|</span>';
+                type();
+            }, 1000);
+        }
+        
+        // Initialize typing animation
+        typeWriter();
         
         // Real-time Developer Jokes API
         const jokeText = document.getElementById('joke-text');

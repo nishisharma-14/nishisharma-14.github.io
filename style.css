@@ -525,6 +525,26 @@ body.dark-mode .footer {
     }
 }
 
+.typing-cursor {
+    color: #8b5cf6;
+    animation: blink 1s infinite;
+    font-weight: normal;
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+.hero-subtitle,
+.hero-description {
+    transition: opacity 0.8s ease;
+}
+
 .hero-subtitle {
     font-size: 1.5rem;
     color: #666;
