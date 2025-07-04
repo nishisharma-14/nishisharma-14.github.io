@@ -79,9 +79,9 @@
                     <div class="github-activity">
                         <h3>GitHub Activity</h3>
                         <div class="real-github-graph">
-                            <img src="https://ghchart.rshah.org/8b5cf6/nishi-sharma22" alt="Nishi's GitHub Contribution Graph" class="github-chart" />
+                            <img src="https://ghchart.rshah.org/8b5cf6/nishisharma-14" alt="Nishi's GitHub Contribution Graph" class="github-chart" />
                             <div class="github-streak">
-                                <img src="https://github-readme-streak-stats.herokuapp.com/?user=nishi-sharma22&theme=radical&hide_border=true&background=FFFFFF00&ring=8b5cf6&fire=a855f7&currStreakLabel=8b5cf6" alt="GitHub Streak" />
+                                <img src="https://github-readme-streak-stats.herokuapp.com/?user=nishisharma-14&theme=radical&hide_border=true&background=FFFFFF00&ring=8b5cf6&fire=a855f7&currStreakLabel=8b5cf6" alt="GitHub Streak" />
                             </div>
                         </div>
                     </div>
@@ -198,7 +198,7 @@
                         <span>+1 (555) 123-4567</span>
                     </div>
                     <div class="social-links">
-                        <a href="https://github.com/nishi-sharma22" id="github-link"><i class="fab fa-github"></i></a>
+                        <a href="https://github.com/nishisharma-14" id="github-link"><i class="fab fa-github"></i></a>
                         <a href="https://linkedin.com/in/nishi-sharma14" id="linkedin-link"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
@@ -310,23 +310,31 @@
         });
         
         // GitHub Activity Graph with Real Data
-        function loadGitHubStats() {
-            // Use static stats to avoid API security issues
-            const userData = {
-                public_repos: 8,
-                followers: 2,
-                following: 5
-            };
+        async function loadGitHubStats() {
+            const username = 'nishi-sharma22';
             
-            const reposData = [
-                { stargazers_count: 2, language: 'HTML' },
-                { stargazers_count: 1, language: 'CSS' },
-                { stargazers_count: 3, language: 'JavaScript' },
-                { stargazers_count: 0, language: 'Python' },
-                { stargazers_count: 1, language: 'C++' }
-            ];
-            
-            updateGitHubStats(userData, reposData);
+            try {
+                // Fetch real GitHub user data
+                const userResponse = await fetch(`https://api.github.com/users/${username}`);
+                const userData = await userResponse.json();
+                
+                // Fetch user's repositories
+                const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+                const reposData = await reposResponse.json();
+                
+                // Update with real GitHub stats
+                updateGitHubStats(userData, reposData);
+                
+            } catch (error) {
+                console.log('GitHub API limit reached, using default stats');
+                // Fallback stats
+                const fallbackData = {
+                    public_repos: 8,
+                    followers: 2,
+                    following: 5
+                };
+                updateGitHubStats(fallbackData, []);
+            }
         }
         
         function updateGitHubStats(userData, reposData) {
@@ -430,28 +438,36 @@
         const jokeText = document.getElementById('joke-text');
         const newJokeBtn = document.getElementById('new-joke-btn');
         
-        function fetchJoke() {
-            // Use local jokes to avoid security issues
-            const jokes = [
-                "Why do programmers prefer dark mode? Because light attracts bugs!",
-                "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
-                "Why do Java developers wear glasses? Because they don't C#!",
-                "A SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'",
-                "Why did the programmer quit his job? He didn't get arrays!",
-                "What's a programmer's favorite hangout place? Foo Bar!",
-                "Why do programmers hate nature? It has too many bugs.",
-                "How do you comfort a JavaScript bug? You console it!",
-                "Why did the developer go broke? Because he used up all his cache!",
-                "What do you call a programmer from Finland? Nerdic!",
-                "Why don't programmers like to go outside? The sun gives them arrays!",
-                "How do you generate a random string? Put a Windows user in front of Vim!"
-            ];
-            return jokes[Math.floor(Math.random() * jokes.length)];
+        async function fetchJoke() {
+            try {
+                jokeText.textContent = 'Loading new joke...';
+                const response = await fetch('https://official-joke-api.appspot.com/jokes/programming/random');
+                const jokeData = await response.json();
+                
+                if (jokeData && jokeData[0]) {
+                    const joke = jokeData[0];
+                    return `${joke.setup} ${joke.punchline}`;
+                } else {
+                    // Fallback to JokeAPI
+                    const fallbackResponse = await fetch('https://v2.jokeapi.dev/joke/Programming?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&type=single');
+                    const fallbackData = await fallbackResponse.json();
+                    return fallbackData.joke || 'Why do programmers prefer dark mode? Because light attracts bugs!';
+                }
+            } catch (error) {
+                // Fallback jokes if APIs fail
+                const fallbackJokes = [
+                    "Why do programmers prefer dark mode? Because light attracts bugs!",
+                    "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+                    "Why do Java developers wear glasses? Because they don't C#!",
+                    "A SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'"
+                ];
+                return fallbackJokes[Math.floor(Math.random() * fallbackJokes.length)];
+            }
         }
         
-        function displayJoke() {
+        async function displayJoke() {
             jokeText.style.opacity = '0';
-            const joke = fetchJoke();
+            const joke = await fetchJoke();
             setTimeout(() => {
                 jokeText.textContent = joke;
                 jokeText.style.opacity = '1';
@@ -464,12 +480,16 @@
         }, 1000);
         
         // New joke button
-        newJokeBtn.addEventListener('click', () => {
-            displayJoke();
-            newJokeBtn.style.transform = 'scale(0.95)';
+        newJokeBtn.addEventListener('click', async () => {
+            newJokeBtn.disabled = true;
+            newJokeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            
+            await displayJoke();
+            
             setTimeout(() => {
-                newJokeBtn.style.transform = 'scale(1)';
-            }, 150);
+                newJokeBtn.disabled = false;
+                newJokeBtn.innerHTML = '<i class="fas fa-refresh"></i> New Joke';
+            }, 500);
         });
         
         // Animate contribution graph on scroll
